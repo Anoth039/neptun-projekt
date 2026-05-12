@@ -32,6 +32,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { nev, tanszek } = req.body;
     if (!nev || !tanszek) return res.status(400).json({ message: 'Név és tanszék kötelező.' });
+    
+    const letezik = await repo().findOneBy({ nev, tanszek });
+    if (letezik) return res.status(409).json({ message: 'Ez az oktató már létezik.' });
+    
     const uj = repo().create({ nev, tanszek });
     await repo().save(uj);
     res.status(201).json(uj);
