@@ -46,6 +46,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { nev, tankor } = req.body;
     if (!nev || !tankor) return res.status(400).json({ message: 'Név és tankör kötelező.' });
+
+    const letezik = await repo().findOneBy({ nev, tankor });
+    if (letezik) return res.status(409).json({ message: 'Ez a hallgató már létezik.' });
+    
     const uj = repo().create({ nev, tankor });
     await repo().save(uj);
     res.status(201).json(uj);
