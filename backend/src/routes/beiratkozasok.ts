@@ -46,7 +46,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
     const meglevo = await AppDataSource.query(
       `SELECT b.id FROM beiratkozas b
-       WHERE b.hallgatoId = ? AND b.kurzusId = ?`,
+       JOIN kurzus k ON b.kurzusId = k.id
+       WHERE b.hallgatoId = ? AND k.tantargyId = (
+         SELECT tantargyId FROM kurzus WHERE id = ?
+       )`,
       [hallgatoId, kurzusId]
     );
     if (meglevo.length > 0) {
