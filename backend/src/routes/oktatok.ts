@@ -48,6 +48,13 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     const oktato = await repo().findOneBy({ id: parseInt(req.params.id) });
     if (!oktato) return res.status(404).json({ message: 'Nem található.' });
+
+    const { nev, tanszek } = req.body;
+    const letezik = await repo().findOneBy({ nev, tanszek });
+    if (letezik && letezik.id !== oktato.id) {
+      return res.status(409).json({ message: 'Ez az oktató már létezik.' });
+    }
+    
     repo().merge(oktato, req.body);
     await repo().save(oktato);
     res.json(oktato);
