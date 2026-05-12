@@ -62,6 +62,13 @@ router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     const hallgato = await repo().findOneBy({ id: parseInt(req.params.id) });
     if (!hallgato) return res.status(404).json({ message: 'Nem található.' });
+
+    const { nev, tankor } = req.body;
+    const letezik = await repo().findOneBy({ nev, tankor });
+    if (letezik && letezik.id !== hallgato.id) {
+      return res.status(409).json({ message: 'Ez a hallgató már létezik.' });
+    }
+    
     repo().merge(hallgato, req.body);
     await repo().save(hallgato);
     res.json(hallgato);
