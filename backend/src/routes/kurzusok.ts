@@ -34,6 +34,11 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     if (!kurzusKod || !felev || !tantargyId) {
       return res.status(400).json({ message: 'Kurzuskód, félév és tantárgy kötelező.' });
     }
+    if (maxLetszam < 1) return res.status(400).json({ message: 'A maximális létszám legalább 1 kell legyen.' });
+
+    const letezik = await repo().findOneBy({ kurzusKod, felev, tantargyId });
+    if (letezik) return res.status(409).json({ message: 'Ez a kurzus már létezik.' });
+    
     const uj = repo().create({ kurzusKod, felev, maxLetszam: maxLetszam || 30, tantargyId });
     await repo().save(uj);
     res.status(201).json(uj);
