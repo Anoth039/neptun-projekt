@@ -124,6 +124,7 @@ export class HallgatokComponent implements OnInit {
       lista.forEach((h) => {
         this.api.getHallgatoAtlag(h.id!).subscribe((a) => {
           this.atlagok[h.id!] = a.atlag;
+          this.cdr.detectChanges();
         });
       });
     });
